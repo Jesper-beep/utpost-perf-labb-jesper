@@ -1,3 +1,4 @@
+import { useDepthLimit } from '@envelop/depth-limit';
 import { getOperationAST } from 'graphql';
 import { createSchema, createYoga } from 'graphql-yoga';
 import jwt from 'jsonwebtoken';
@@ -40,7 +41,7 @@ const countQueries = {
 export const yoga = createYoga({
   schema: createSchema({ typeDefs, resolvers }),
   graphqlEndpoint: '/graphql',
-  plugins: [countQueries],
+  plugins: [countQueries, useDepthLimit({ maxDepth: 3 })],
   // context byggs en gång per anrop och skickas till varje resolver som tredje argument.
   context: ({ request }) => {
     const stats = { queries: 0 };
