@@ -74,6 +74,8 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
     <img
       class="hero-img"
       src="/bilder/start.webp"
+      srcset="/bilder/start-800.webp 800w, /bilder/start.webp 1200w"
+      sizes="(min-width: 1280px) 1280px, 100vw"
       width="1200"
       height="600"
       alt=""

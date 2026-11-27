@@ -6,10 +6,29 @@
 # nginx egna variabler ($uri, $host …) rörs inte: envsubst byter bara ut namn som finns i miljön.
 #
 # M8: security-headers.conf inkluderas i varje location (nginx ärver inte add_header mellan nivåer).
+
+# Cache för /graphql. Måste stå utanför server-blocket (http-nivå), och namnet matchar proxy_cache nedan.
+proxy_cache_path /var/cache/nginx/api_cache keys_zone=api_cache:10m max_size=50m inactive=1m;
+
 server {
   listen 80;
   root /usr/share/nginx/html;
   server_tokens off;   # M8: nginx skriver inte ut sin version i svaren (A02)
+
+  gzip on;
+  gzip_vary on;
+  gzip_proxied any;
+  gzip_comp_level 6;
+  gzip_min_length 256;
+  gzip_types
+    text/plain
+    text/css
+    text/xml
+    text/javascript
+    application/javascript
+    application/json
+    application/xml
+    image/svg+xml;
 
   # Vue Router sköter adresserna i browsern. /guider/kebnekaise finns inte som fil –
   # hittas ingen fil skickas index.html, och routern tar det därifrån.
@@ -25,6 +44,12 @@ server {
     expires 1y;
     add_header Cache-Control "public, immutable";
   }
+  location ~* \.(jpg|jpeg|png|gif|ico|webp|svg)$ {
+    include /etc/nginx/security-headers.conf;
+    expires 1y;
+    add_header Cache-Control "public, immutable" always;
+    access_log off;
+  }
 
   # Browsern pratar bara med den här servern. Anrop till /api och /graphql skickas vidare
   # till API:et – adressen kommer från miljön, inte från den här filen.
@@ -35,7 +60,16 @@ server {
   }
   location /graphql {
     include /etc/nginx/security-headers.conf;
-    add_header Cache-Control "no-store" always;
+
+    
+    proxy_cache api_cache;
+    proxy_cache_valid 200 1s;
+    proxy_cache_bypass $http_authorization;
+    proxy_no_cache $http_authorization;
+
+   
+    add_header Cache-Control "public, max-age=1, stale-while-revalidate=10" always;
+
     proxy_pass http://${API_UPSTREAM};
   }
 }
