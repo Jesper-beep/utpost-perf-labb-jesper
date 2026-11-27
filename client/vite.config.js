@@ -16,6 +16,9 @@ export default defineConfig({
       '/graphql': 'http://localhost:4000',
     },
   },
+  build: {
+    minify: 'esbuild',
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

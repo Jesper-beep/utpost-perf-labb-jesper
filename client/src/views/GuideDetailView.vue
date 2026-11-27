@@ -51,6 +51,10 @@ const { data, fetching, error } = useQuery({ query: GuideDocument, variables })
       v-if="data.guide.heroImage"
       class="hero-img"
       :src="`/bilder/${data.guide.heroImage}`"
+      :srcset="`/bilder/${data.guide.heroImage.replace('.jpg', '')}-800.webp 800w, /bilder/${data.guide.heroImage.replace('.jpg', '')}-1200.webp 1200w`"
+      sizes="(min-width: 720px) 700px, 100vw"
+      width="1200"
+      height="800"
       alt=""
     />
     <h1>{{ data.guide.title }}</h1>
@@ -76,6 +80,7 @@ const { data, fetching, error } = useQuery({ query: GuideDocument, variables })
 }
 .hero-img {
   width: 100%;
+  height: auto;
   border-radius: 6px;
   margin-bottom: 12px;
 }

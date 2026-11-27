@@ -16,6 +16,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 
 const LHCI = '@lhci/cli@0.16.1'
 const BASE = (process.env.PERF_URL ?? 'http://localhost:3001').replace(/\/$/, '')
+const BROWSER_PATH = process.env.PERF_BROWSER ?? '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
 const args = process.argv.slice(2)
 const runs = args.includes('--runs') ? Number(args[args.indexOf('--runs') + 1]) : 1
 const saveBefore = args.includes('--fore')
@@ -71,7 +72,7 @@ try {
 console.log(`Mäter ${pages.length} sidor på ${BASE}, ${runs} körning${runs > 1 ? 'ar' : ''} per sida …`)
 execFileSync(
   'npx',
-  ['--yes', LHCI, 'collect', `--numberOfRuns=${runs}`, ...pages.map((p) => `--url=${BASE}${p.path}`)],
+  ['--yes', LHCI, 'collect', `--collect.chromePath=${BROWSER_PATH}`, `--numberOfRuns=${runs}`, ...pages.map((p) => `--url=${BASE}${p.path}`)],
   { stdio: ['ignore', 'ignore', 'inherit'], shell: process.platform === 'win32' },
 )
 
