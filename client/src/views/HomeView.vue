@@ -94,7 +94,15 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
     <h2>Populärast just nu</h2>
     <ul class="cards">
       <li v-for="g in data.popularGuides" :key="g.slug">
-        <img v-if="g.heroImage" :src="`/bilder/${g.heroImage}`" alt="" />
+        <img
+          v-if="g.heroImage"
+          :src="`/bilder/${g.heroImage}`"
+          :srcset="`/bilder/${g.heroImage.replace('.jpg', '')}-800.webp 800w, /bilder/${g.heroImage.replace('.jpg', '')}-1200.webp 1200w`"
+          sizes="(min-width: 600px) 250px, 50vw"
+          width="1200"
+          height="800"
+          alt=""
+        />
         <RouterLink :to="`/guider/${g.slug}`">{{ g.title }}</RouterLink>
         <span class="muted"> {{ g.region }}</span>
       </li>
@@ -139,6 +147,7 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
 }
 .cards img {
   width: 100%;
+  height: auto;
   border-radius: 4px;
   display: block;
 }
